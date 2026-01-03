@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">KidUply</string>
+    <string name="title_activity_main">KidUply</string>
+    <string name="package_name">com.kiduply.app</string>
+    <string name="custom_url_scheme">com.kiduply.app</string>
+</resources>
