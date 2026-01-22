@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Animated,
+  SafeAreaView,
   StatusBar,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -19,99 +20,117 @@ import { useUserData } from '../../hooks/useUserData';
 
 const { width } = Dimensions.get('window');
 
-// Mock data - buni keyinchalik Supabase'dan olamiz
+// 1. Leaderboard uchun soxta ma'lumotlar (Buni keyin Supabase'dan real-time tortamiz)
 const TOP_PLAYERS = [
-  { id: '1', name: 'Alisher', xp: 2540, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alisher', rank: 1, streak: 12 },
-  { id: '2', name: 'Sofia', xp: 2100, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sofia', rank: 2, streak: 8 },
-  { id: '3', name: 'Jasur', xp: 1950, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jasur', rank: 3, streak: 15 },
+  { id: '1', name: 'Alisher', xp: 2540, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alisher', rank: 1, frame: '#FFD700', badge: 'Math King' },
+  { id: '2', name: 'Sofia', xp: 2100, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sofia', rank: 2, frame: '#C0C0C0', badge: 'Explorer' },
+  { id: '3', name: 'Jasur', xp: 1950, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jasur', rank: 3, frame: '#CD7F32', badge: 'Quick Learner' },
 ];
 
-const LEADERBOARD_DATA = [
-  { id: '4', name: 'Madina', xp: 1800, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Madina', rank: 4 },
-  { id: '5', name: 'Leon', xp: 1750, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Leon', rank: 5 },
-  { id: '6', name: 'Zahro', xp: 1600, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Zahro', rank: 6 },
-  { id: '7', name: 'Sardor', xp: 1550, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sardor', rank: 7 },
+const LEADERBOARD_LIST = [
+  { id: '4', name: 'Madina', xp: 1800, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Madina', rank: 4, frame: 'transparent' },
+  { id: '5', name: 'Leon', xp: 1750, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Leon', rank: 5, frame: 'transparent' },
+  { id: '6', name: 'Zahro', xp: 1600, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Zahro', rank: 6, frame: '#00F3FF' }, // Neon frame egasi
+  { id: '7', name: 'Sardor', xp: 1550, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sardor', rank: 7, frame: 'transparent' },
+  { id: '8', name: 'Emina', xp: 1400, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emina', rank: 8, frame: 'transparent' },
 ];
 
 export const ConnectScreen = () => {
   const { user } = useUserData();
-  const [tab, setTab] = useState('global'); // 'global' | 'friends'
-  const scrollY = new Animated.Value(0);
+  const [activeTab, setActiveTab] = useState('global');
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  // Header animatsiyasi uchun
+  const headerTranslateY = scrollY.interpolate({
+    inputRange: [0, 100],
+    outputRange: [0, -50],
+    extrapolate: 'clamp',
+  });
 
   const renderTopThree = () => (
     <View style={styles.podiumContainer}>
-      {/* 2-o'rin */}
+      {/* 2-O'rin */}
       <View style={[styles.podiumItem, { marginTop: 40 }]}>
-        <View style={styles.avatarWrapper}>
-          <Image source={{ uri: TOP_PLAYERS[1].avatar }} style={styles.avatarLarge} />
-          <View style={[styles.badgeContainer, { backgroundColor: '#C0C0C0' }]}>
-            <Text style={styles.badgeText}>2</Text>
+        <View style={[styles.avatarWrapper, { borderColor: '#C0C0C0' }]}>
+          <Image source={{ uri: TOP_PLAYERS[1].avatar }} style={styles.avatarPodium} />
+          <View style={[styles.rankBadge, { backgroundColor: '#C0C0C0' }]}>
+            <Text style={styles.rankBadgeText}>2</Text>
           </View>
         </View>
         <Text style={styles.podiumName}>{TOP_PLAYERS[1].name}</Text>
-        <View style={styles.xpTag}><Text style={styles.xpText}>{TOP_PLAYERS[1].xp} XP</Text></View>
+        <View style={styles.xpPill}><Text style={styles.xpPillText}>{TOP_PLAYERS[1].xp} XP</Text></View>
       </View>
 
-      {/* 1-o'rin */}
+      {/* 1-O'rin (G'olib) */}
       <View style={styles.podiumItem}>
-        <MaterialCommunityIcons name="crown" size={30} color="#FFD700" style={styles.crown} />
-        <View style={[styles.avatarWrapper, { borderColor: '#FFD700', borderWidth: 3 }]}>
-          <Image source={{ uri: TOP_PLAYERS[0].avatar }} style={styles.avatarWinner} />
-          <View style={[styles.badgeContainer, { backgroundColor: '#FFD700' }]}>
-            <Text style={styles.badgeText}>1</Text>
+        <MaterialCommunityIcons name="crown" size={34} color="#FFD700" style={styles.crownIcon} />
+        <View style={[styles.avatarWrapper, { borderColor: '#FFD700', width: 90, height: 90, borderRadius: 45 }]}>
+          <Image source={{ uri: TOP_PLAYERS[0].avatar }} style={styles.avatarPodium} />
+          <View style={[styles.rankBadge, { backgroundColor: '#FFD700', width: 28, height: 28 }]}>
+            <Text style={[styles.rankBadgeText, { color: '#000' }]}>1</Text>
           </View>
         </View>
-        <Text style={[styles.podiumName, { fontSize: 18, fontWeight: '900' }]}>{TOP_PLAYERS[0].name}</Text>
-        <View style={[styles.xpTag, { backgroundColor: '#FFD700' }]}><Text style={[styles.xpText, { color: '#000' }]}>{TOP_PLAYERS[0].xp} XP</Text></View>
+        <Text style={[styles.podiumName, { fontSize: 18 }]}>{TOP_PLAYERS[0].name}</Text>
+        <View style={[styles.xpPill, { backgroundColor: '#FFD700' }]}>
+          <Text style={[styles.xpPillText, { color: '#1A2B3C' }]}>{TOP_PLAYERS[0].xp} XP</Text>
+        </View>
       </View>
 
-      {/* 3-o'rin */}
+      {/* 3-O'rin */}
       <View style={[styles.podiumItem, { marginTop: 60 }]}>
-        <View style={styles.avatarWrapper}>
-          <Image source={{ uri: TOP_PLAYERS[2].avatar }} style={styles.avatarLarge} />
-          <View style={[styles.badgeContainer, { backgroundColor: '#CD7F32' }]}>
-            <Text style={styles.badgeText}>3</Text>
+        <View style={[styles.avatarWrapper, { borderColor: '#CD7F32' }]}>
+          <Image source={{ uri: TOP_PLAYERS[2].avatar }} style={styles.avatarPodium} />
+          <View style={[styles.rankBadge, { backgroundColor: '#CD7F32' }]}>
+            <Text style={styles.rankBadgeText}>3</Text>
           </View>
         </View>
         <Text style={styles.podiumName}>{TOP_PLAYERS[2].name}</Text>
-        <View style={styles.xpTag}><Text style={styles.xpText}>{TOP_PLAYERS[2].xp} XP</Text></View>
+        <View style={styles.xpPill}><Text style={styles.xpPillText}>{TOP_PLAYERS[2].xp} XP</Text></View>
       </View>
     </View>
   );
 
   const renderLeaderboardItem = ({ item }: any) => (
-    <BlurView intensity={20} tint="light" style={styles.listItem}>
+    <Animated.View style={styles.listCard}>
       <View style={styles.listLeft}>
-        <Text style={styles.rankText}>{item.rank}</Text>
-        <Image source={{ uri: item.avatar }} style={styles.avatarSmall} />
-        <Text style={styles.listName}>{item.name}</Text>
+        <Text style={styles.rankNumber}>{item.rank}</Text>
+        <View style={[styles.listAvatarFrame, { borderColor: item.frame || 'transparent' }]}>
+          <Image source={{ uri: item.avatar }} style={styles.avatarSmall} />
+        </View>
+        <View>
+          <Text style={styles.listName}>{item.name}</Text>
+          {item.badge && (
+            <View style={styles.badgeContainer}>
+              <MaterialCommunityIcons name="shield-check" size={12} color="#6BCF7F" />
+              <Text style={styles.badgeText}>{item.badge}</Text>
+            </View>
+          )}
+        </View>
       </View>
       <View style={styles.listRight}>
-        <Text style={styles.listXp}>{item.xp} XP</Text>
-        <MaterialCommunityIcons name="chevron-right" size={20} color="#CBD5E0" />
+        <Text style={styles.listXpText}>{item.xp}</Text>
+        <Text style={styles.listXpLabel}>XP</Text>
       </View>
-    </BlurView>
+    </Animated.View>
   );
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <LinearGradient colors={['#1A2B3C', '#2D4A5D']} style={styles.headerBackground}>
-        
-        {/* Header Tabs */}
-        <SafeAreaView style={styles.headerContent}>
-          <View style={styles.tabContainer}>
+      <LinearGradient colors={['#1e3c72', '#2a5298']} style={styles.topSection}>
+        <SafeAreaView style={{ flex: 1 }}>
+          <View style={styles.tabBar}>
             <TouchableOpacity 
-              onPress={() => { setTab('global'); Haptics.selectionAsync(); }}
-              style={[styles.tab, tab === 'global' && styles.activeTab]}
+              onPress={() => { setActiveTab('global'); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
+              style={[styles.tabButton, activeTab === 'global' && styles.tabActive]}
             >
-              <Text style={[styles.tabText, tab === 'global' && styles.activeTabText]}>Global</Text>
+              <Text style={[styles.tabText, activeTab === 'global' && styles.tabTextActive]}>Global</Text>
             </TouchableOpacity>
             <TouchableOpacity 
-              onPress={() => { setTab('friends'); Haptics.selectionAsync(); }}
-              style={[styles.tab, tab === 'friends' && styles.activeTab]}
+              onPress={() => { setActiveTab('friends'); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
+              style={[styles.tabButton, activeTab === 'friends' && styles.tabActive]}
             >
-              <Text style={[styles.tabText, tab === 'friends' && styles.activeTabText]}>Friends</Text>
+              <Text style={[styles.tabText, activeTab === 'friends' && styles.tabTextActive]}>Friends</Text>
             </TouchableOpacity>
           </View>
 
@@ -119,34 +138,41 @@ export const ConnectScreen = () => {
         </SafeAreaView>
       </LinearGradient>
 
-      {/* List Section */}
-      <View style={styles.listWrapper}>
-        <FlatList
-          data={LEADERBOARD_DATA}
+      <View style={styles.bottomSection}>
+        <Animated.FlatList
+          data={LEADERBOARD_LIST}
           keyExtractor={(item) => item.id}
           renderItem={renderLeaderboardItem}
-          contentContainerStyle={styles.listPadding}
           showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContent}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: true }
+          )}
           ListHeaderComponent={
             <View style={styles.listHeader}>
-              <Text style={styles.listTitle}>Top Challengers</Text>
-              <TouchableOpacity style={styles.inviteButton}>
-                <MaterialCommunityIcons name="plus" size={18} color="white" />
-                <Text style={styles.inviteText}>Invite</Text>
+              <Text style={styles.listTitle}>All Time Challengers</Text>
+              <TouchableOpacity style={styles.filterBtn}>
+                <MaterialCommunityIcons name="filter-variant" size={20} color="#718096" />
               </TouchableOpacity>
             </View>
           }
         />
       </View>
 
-      {/* Fixed User Ranking at Bottom */}
-      <BlurView intensity={90} tint="dark" style={styles.currentUserBar}>
+      {/* User's Fixed Position Bar */}
+      <BlurView intensity={80} tint="dark" style={styles.userBar}>
         <View style={styles.listLeft}>
-          <Text style={[styles.rankText, { color: '#6BCF7F' }]}>124</Text>
-          <Image source={{ uri: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.child_name}` }} style={styles.avatarSmall} />
-          <Text style={[styles.listName, { color: 'white' }]}>You ({user?.child_name})</Text>
+          <Text style={[styles.rankNumber, { color: '#6BCF7F' }]}>128</Text>
+          <View style={[styles.listAvatarFrame, { borderColor: user?.active_frame_color || '#6BCF7F' }]}>
+            <Image source={{ uri: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.child_name}` }} style={styles.avatarSmall} />
+          </View>
+          <Text style={[styles.listName, { color: '#FFF' }]}>{user?.child_name || 'You'}</Text>
         </View>
-        <Text style={[styles.listXp, { color: '#6BCF7F' }]}>{user?.total_xp || 0} XP</Text>
+        <View style={styles.listRight}>
+          <Text style={[styles.listXpText, { color: '#6BCF7F' }]}>{user?.total_xp || 0}</Text>
+          <Text style={[styles.listXpLabel, { color: '#A0AEC0' }]}>XP</Text>
+        </View>
       </BlurView>
     </View>
   );
@@ -154,57 +180,41 @@ export const ConnectScreen = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFC' },
-  headerBackground: { height: 450, borderBottomLeftRadius: 40, borderBottomRightRadius: 40, overflow: 'hidden' },
-  headerContent: { flex: 1, paddingTop: 40 },
-  tabContainer: { 
-    flexDirection: 'row', 
-    backgroundColor: 'rgba(255,255,255,0.1)', 
-    marginHorizontal: 50, 
-    borderRadius: 20, 
-    padding: 4 
-  },
-  tab: { flex: 1, paddingVertical: 8, alignItems: 'center', borderRadius: 16 },
-  activeTab: { backgroundColor: '#6BCF7F' },
-  tabText: { color: 'rgba(255,255,255,0.6)', fontWeight: '700' },
-  activeTabText: { color: 'white' },
+  topSection: { height: 420, borderBottomLeftRadius: 40, borderBottomRightRadius: 40 },
+  tabBar: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.15)', marginHorizontal: 60, borderRadius: 20, padding: 4, marginTop: 10 },
+  tabButton: { flex: 1, paddingVertical: 8, alignItems: 'center', borderRadius: 16 },
+  tabActive: { backgroundColor: '#FFF' },
+  tabText: { color: 'rgba(255,255,255,0.7)', fontWeight: '700', fontSize: 14 },
+  tabTextActive: { color: '#1e3c72' },
   
-  podiumContainer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'flex-end', marginTop: 30 },
-  podiumItem: { alignItems: 'center', width: width / 3.5 },
-  avatarWrapper: { width: 70, height: 70, borderRadius: 35, backgroundColor: '#E2E8F0', padding: 2 },
-  avatarLarge: { width: '100%', height: '100%', borderRadius: 35 },
-  avatarWinner: { width: '100%', height: '100%', borderRadius: 35 },
-  crown: { marginBottom: -10, zIndex: 1 },
-  badgeContainer: { 
-    position: 'absolute', bottom: -5, right: -5, 
-    width: 24, height: 24, borderRadius: 12, 
-    justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#FFF' 
-  },
-  badgeText: { color: 'white', fontSize: 12, fontWeight: '900' },
-  podiumName: { color: 'white', marginTop: 12, fontWeight: '700', fontSize: 14 },
-  xpTag: { backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, marginTop: 6 },
-  xpText: { color: 'white', fontSize: 12, fontWeight: '800' },
+  podiumContainer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'flex-end', marginTop: 25 },
+  podiumItem: { alignItems: 'center', width: width * 0.28 },
+  avatarWrapper: { width: 75, height: 75, borderRadius: 37.5, borderWidth: 3, padding: 3, backgroundColor: 'rgba(255,255,255,0.1)' },
+  avatarPodium: { width: '100%', height: '100%', borderRadius: 40 },
+  crownIcon: { marginBottom: -10, zIndex: 1 },
+  rankBadge: { position: 'absolute', bottom: -5, right: -5, width: 24, height: 24, borderRadius: 12, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#FFF' },
+  rankBadgeText: { color: '#FFF', fontSize: 12, fontWeight: '900' },
+  podiumName: { color: '#FFF', fontWeight: '800', marginTop: 12, fontSize: 14 },
+  xpPill: { backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12, marginTop: 6 },
+  xpPillText: { color: '#FFF', fontSize: 11, fontWeight: '900' },
 
-  listWrapper: { flex: 1, marginTop: -40, backgroundColor: 'white', borderTopLeftRadius: 40, borderTopRightRadius: 40, paddingHorizontal: 20 },
-  listHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 25 },
-  listTitle: { fontSize: 20, fontWeight: '800', color: '#1A365D' },
-  inviteButton: { flexDirection: 'row', backgroundColor: '#6BCF7F', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 12, alignItems: 'center' },
-  inviteText: { color: 'white', fontWeight: '700', marginLeft: 4 },
-  
-  listItem: { 
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', 
-    padding: 15, backgroundColor: '#F8FAFC', borderRadius: 20, marginBottom: 12,
-    borderWidth: 1, borderColor: '#EDF2F7'
-  },
-  listLeft: { flexDirection: 'row', alignItems: 'center' },
-  rankText: { fontSize: 16, fontWeight: '800', color: '#718096', width: 30 },
-  avatarSmall: { width: 45, height: 45, borderRadius: 22, marginRight: 15 },
+  bottomSection: { flex: 1, marginTop: -30, backgroundColor: '#FFF', borderTopLeftRadius: 40, borderTopRightRadius: 40 },
+  listContent: { paddingHorizontal: 20, paddingTop: 30, paddingBottom: 120 },
+  listHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  listTitle: { fontSize: 20, fontWeight: '900', color: '#2D3748' },
+  filterBtn: { padding: 8, backgroundColor: '#F7FAFC', borderRadius: 10 },
+
+  listCard: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F8FAFC', padding: 15, borderRadius: 22, marginBottom: 12, borderWidth: 1, borderColor: '#EDF2F7' },
+  listLeft: { flexDirection: 'row', alignItems: 'center', flex: 1 },
+  rankNumber: { fontSize: 16, fontWeight: '900', color: '#A0AEC0', width: 35 },
+  listAvatarFrame: { width: 50, height: 50, borderRadius: 25, borderWidth: 2, padding: 2, marginRight: 15 },
+  avatarSmall: { width: '100%', height: '100%', borderRadius: 25 },
   listName: { fontSize: 16, fontWeight: '700', color: '#2D3748' },
-  listRight: { flexDirection: 'row', alignItems: 'center' },
-  listXp: { fontSize: 15, fontWeight: '800', color: '#4A5568', marginRight: 10 },
+  badgeContainer: { flexDirection: 'row', alignItems: 'center', marginTop: 2 },
+  badgeText: { fontSize: 11, color: '#6BCF7F', fontWeight: '700', marginLeft: 4 },
+  listRight: { alignItems: 'flex-end' },
+  listXpText: { fontSize: 17, fontWeight: '900', color: '#2D3748' },
+  listXpLabel: { fontSize: 10, fontWeight: '700', color: '#A0AEC0' },
 
-  currentUserBar: { 
-    position: 'absolute', bottom: 90, left: 16, right: 16, 
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', 
-    padding: 15, borderRadius: 25, overflow: 'hidden', elevation: 10
-  }
+  userBar: { position: 'absolute', bottom: 100, left: 15, right: 15, borderRadius: 25, padding: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', overflow: 'hidden', elevation: 10 }
 });
