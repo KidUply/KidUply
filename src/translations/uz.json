@@ -1,0 +1,47 @@
+{
+  "onboarding": {
+    "selectLanguage": "Tilni tanlang",
+    "uzbek": "O'zbek tili",
+    "english": "Ingliz tili",
+    "continue": "Davom etish",
+    "childInfo": "Farzand haqida ma'lumot",
+    "childName": "Bolaning ismi",
+    "childNamePlaceholder": "Masalan: Emma",
+    "birthYear": "Tug'ilgan yili",
+    "selectYear": "Yilni tanlang",
+    "gender": "Jinsi",
+    "boy": "O'g'il bola",
+    "girl": "Qiz bola",
+    "parentInfo": "Ota-ona haqida ma'lumot",
+    "parentName": "Sizning ismingiz",
+    "parentNamePlaceholder": "Masalan: Jane",
+    "male": "Erkak",
+    "female": "Ayol",
+    "finish": "Boshlash",
+    "back": "Orqaga"
+  }
+}
+// src/translations/en.json
+{
+  "onboarding": {
+    "selectLanguage": "Select Language",
+    "uzbek": "Uzbek",
+    "english": "English",
+    "continue": "Continue",
+    "childInfo": "Child Information",
+    "childName": "Child's Name",
+    "childNamePlaceholder": "e.g., Emma",
+    "birthYear": "Birth Year",
+    "selectYear": "Select Year",
+    "gender": "Gender",
+    "boy": "Boy",
+    "girl": "Girl",
+    "parentInfo": "Parent Information",
+    "parentName": "Your Name",
+    "parentNamePlaceholder": "e.g., Jane",
+    "male": "Male",
+    "female": "Female",
+    "finish": "Get Started",
+    "back": "Back"
+  }
+}
