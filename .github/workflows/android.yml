@@ -7,28 +7,36 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
+      # 1️⃣ Repodan code oladi
       - uses: actions/checkout@v3
 
+      # 2️⃣ Node.js o‘rnatadi
       - name: Install Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
           node-version: '20'
 
+      # 3️⃣ Expo CLI va EAS CLI o‘rnatadi
       - name: Install Expo CLI & EAS CLI
         run: npm install -g expo-cli eas-cli
 
+      # 4️⃣ Expo token bilan login qiladi
       - name: Login to Expo
         run: eas login --token ${{ secrets.EXPO_TOKEN }}
 
+      # 5️⃣ Dependencies o‘rnatadi
       - name: Install dependencies
         run: npm install
 
+      # 6️⃣ APK build qiladi (production profile)
       - name: Run EAS Build
         run: eas build --platform android --profile production --non-interactive
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
+      # 7️⃣ Artifact upload qiladi (v4 bilan)
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
           name: KidUply-APK
-          path: ./build/*.apk
+          path: ./build/**/*.apk
