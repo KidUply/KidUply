@@ -4,10 +4,10 @@
     "slug": "kiduply",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icon_KidUply.png",       // asosiy app icon
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/splash.png",         // splash rasm
       "resizeMode": "contain",
       "backgroundColor": "#EEF8EC"
     },
@@ -18,8 +18,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#EEF8EC"
+        "foregroundImage": "./assets/icon_KidUply.png",  // adaptive icon uchun frontend
+        "backgroundColor": "#EEF8EC"                     // adaptive background
       },
       "package": "com.kiduply.app",
       "versionCode": 1,
