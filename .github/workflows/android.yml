@@ -1,0 +1,34 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Expo CLI & EAS CLI
+        run: npm install -g expo-cli eas-cli
+
+      - name: Login to Expo
+        run: eas login --token ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run EAS Build
+        run: eas build --platform android --profile production --non-interactive
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: KidUply-APK
+          path: ./build/*.apk
