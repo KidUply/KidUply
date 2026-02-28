@@ -4,10 +4,10 @@
     "slug": "kiduply",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon_KidUply.png",       // asosiy app icon
+    "icon": "./assets/icon_KidUply.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",         // splash rasm
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#EEF8EC"
     },
@@ -18,20 +18,20 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon_KidUply.png",  // adaptive icon uchun frontend
-        "backgroundColor": "#EEF8EC"                     // adaptive background
+        "foregroundImage": "./assets/icon_KidUply.png",
+        "backgroundColor": "#EEF8EC"
       },
       "package": "com.kiduply.app",
       "versionCode": 1,
       "permissions": []
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/icon_KidUply.png"
     },
     "plugins": [],
     "extra": {
       "eas": {
-        "projectId": "37f10e91-d4b5-4b7c-a76c-416759777867"
+        "projectId": "YOUR_EAS_PROJECT_ID"
       }
     }
   }
