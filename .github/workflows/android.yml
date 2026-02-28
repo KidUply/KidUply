@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Repodan code oladi
+      # 1️⃣ Code’ni repodan oladi
       - uses: actions/checkout@v3
 
       # 2️⃣ Node.js o‘rnatadi
@@ -22,19 +22,17 @@ jobs:
       - name: Install Expo CLI & EAS CLI
         run: npm install -g expo-cli eas-cli
 
-      # 4️⃣ Expo token bilan login qiladi
-      - name: Login to Expo
-        run: eas login --token ${{ secrets.EXPO_TOKEN }}
-
-      # 5️⃣ Dependencies o‘rnatadi
+      # 4️⃣ Dependencies o‘rnatadi
       - name: Install dependencies
         run: npm install
 
-      # 6️⃣ APK build qiladi (production profile)
+      # 5️⃣ APK build qiladi (token environment variable orqali)
       - name: Run EAS Build
+        env:
+          EAS_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: eas build --platform android --profile production --non-interactive
 
-      # 7️⃣ Artifact upload qiladi (v4 bilan)
+      # 6️⃣ Artifact upload qiladi (v4)
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
