@@ -1,25 +1,20 @@
 {
   "cli": {
-    "version": ">= 5.9.1"
+    "version": ">= 3.0.0"
   },
   "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal"
-    },
-    "preview": {
+    "KidUply": {
+      "developmentClient": false,
       "distribution": "internal",
       "android": {
         "buildType": "apk"
       }
     },
     "production": {
+      "distribution": "store",
       "android": {
-        "buildType": "apk"
+        "buildType": "app-bundle"
       }
     }
-  },
-  "submit": {
-    "production": {}
   }
 }
