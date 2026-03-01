@@ -7,32 +7,19 @@
     "icon": "./assets/icon_KidUply.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/icon_KidUply.png",
       "resizeMode": "contain",
       "backgroundColor": "#EEF8EC"
     },
-    "assetBundlePatterns": ["**/*"],
-    "ios": {
-      "supportsTablet": false,
-      "bundleIdentifier": "com.kiduply.app"
-    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon_KidUply.png",
         "backgroundColor": "#EEF8EC"
       },
-      "package": "com.kiduply.app",
-      "versionCode": 1,
-      "permissions": []
-    },
-    "web": {
-      "favicon": "./assets/icon_KidUply.png"
-    },
-    "plugins": [],
-    "extra": {
-      "eas": {
-        "projectId": "YOUR_EAS_PROJECT_ID"
-      }
+      "package": "com.kiduply.app"
     }
   }
 }
